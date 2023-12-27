@@ -143,3 +143,4 @@ fn parse_total(cur_line: &mut Line, mut prev_line: Line) -> u32 {
 
     total
 }
+

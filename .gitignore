@@ -1,3 +1,4 @@
 2023/rust/foo/target/*
+2023/rust/foo/*.txt
 2023/rust/foo/Cargo.lock
 2023/rust/foo/Cargo.toml
