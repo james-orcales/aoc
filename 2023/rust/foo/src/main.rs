@@ -8,19 +8,16 @@ fn main() {
     };
     let mut total: u32 = 0;
     let mut prev_line = None;
-
     for line in lines {
         let Ok(line) = line else { return };
-        let mut pepe = parse_line(&line);
+        let mut line = parse_line(&line);
         if prev_line.is_none() {
-            prev_line = Some(pepe);
+            prev_line = Some(line);
             continue
         }
-        let tite = parse_total(&mut pepe, prev_line.unwrap());
-        total += tite;
-        println!("{}: {}", line, tite);
+        total += parse_total(&mut line, prev_line.unwrap());
 
-        prev_line = Some(pepe);
+        prev_line = Some(line);
     }
     println!("{}", total);
 }
