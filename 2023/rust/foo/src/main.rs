@@ -2,11 +2,13 @@ use std::io::*;
 use std::{fs::File, path::Path};
 
 
-fn main() { let Ok(lines) = read_lines("src/3.txt") else {
+fn main() { 
+    let Ok(lines) = read_lines("src/3.txt") else {
         return;
     };
     let mut total: u32 = 0;
     let mut prev_line = None;
+
     for line in lines {
         let Ok(line) = line else { return };
         let mut pepe = parse_line(&line);
@@ -64,10 +66,6 @@ impl PartNumberBuilder {
         }
     }
 
-    fn push(&mut self, ch: char) {
-        self.number_string.push(ch);
-    }
-
     fn build(self, right_boundary: usize) -> PartNumber {
         let number = self.number_string.parse::<u32>().expect("Not u32 string");
         PartNumber {
@@ -94,16 +92,17 @@ fn parse_line(line_str: &str) -> Line {
             if ch != '.' { line.sym_indices.push(i); }
 
             let Some(&(_, next_ch)) = ci.peek() else { continue };
-            if next_ch.is_ascii_digit() { pnb = Some(PartNumberBuilder::new(i)); }
-
-        } else if ch.is_ascii_digit() {
-            if !inside_number {
-                pnb = Some(PartNumberBuilder::new(i))
+            if next_ch.is_ascii_digit() { 
+                pnb = Some(PartNumberBuilder::new(i)); 
             }
-
-            pnb.as_mut().unwrap().push(ch)
+        } else if ch.is_ascii_digit() {
+            if !inside_number { pnb = Some(PartNumberBuilder::new(i)) }
+            pnb.as_mut().unwrap().number_string.push(ch);
         }
+    }
 
+    if pnb.is_some() {
+        line.part_numbers.push(pnb.unwrap().build(line_str.len()-1));
     }
 
     line
@@ -115,18 +114,14 @@ fn parse_total(cur_line: &mut Line, mut prev_line: Line) -> u32 {
     prev_line.sym_indices.extend(cur_line.sym_indices.iter());
     let combined_si = prev_line.sym_indices;
 
-    let mut prev_retain = vec![];
-    'outer: while let Some(p) = prev_line.part_numbers.pop() {
+    'outer: for p in prev_line.part_numbers {
         for i in &combined_si {
             if i >= &p.zone.0 && i <= &p.zone.1 {
                 total += p.number;
                 continue 'outer
             }
         }
-        prev_retain.push(p);
     }
-
-    prev_line.part_numbers = prev_retain;
 
     let mut cur_retain = vec![];
     'outer: while let Some(p) = cur_line.part_numbers.pop() {
